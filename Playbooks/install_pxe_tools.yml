@@ -2,6 +2,9 @@
   - hosts: vm_instances
     become: true
     tasks:
+      - name: Update apt packages
+        apt: upgrade=yes update_cache=yes
+        when: ansible_facts['os_family'] == "Debian"
       - name: "Install PXE TFTP utilities"
         apt:
           name: "{{ packages }}"
@@ -35,13 +38,13 @@
           url: http://releases.ubuntu.com/16.04/ubuntu-16.04.6-server-amd64.iso
           dest: /tmp/ubuntu-16.04.6-server-amd64.iso
           mode: '0644'
-      - name: Mount DVD read-only
+      - name: Mount Ubuntu server ISO read-only
         mount: 
           path: /mnt/iso-storage
           src: /tmp/ubuntu-16.04.6-server-amd64.iso
           fstype: iso9660
-          opts: loop
-          state: present
+          opts: ro,loop
+          state: mounted
       - name: "Copy Ubuntu ISO install files to TFTP directory"
         copy:
           src: /mnt/iso-storage/install/netboot/
