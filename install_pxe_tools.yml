@@ -1,0 +1,37 @@
+---
+  - hosts: homeservers
+    become: true
+    tasks:
+      - name: "Install PXE TFTP utilities"
+        apt:
+          name: "{{ packages }}"
+        vars:
+          packages:
+          - apache2
+          - tftpd-hpa
+          - inetutils-inetd
+      - name: "Update the tftp configuration"
+        blockinfile:
+          path: /etc/default/tftpd-hpa
+          block: |
+            RUN_DAEMON="yes"
+            OPTIONS="-l -s /var/lib/tftpboot"
+      - name: "Update inetd.conf"
+        blockinfile:
+          path: /etc/inetd.conf
+          block: |
+            tftp    dgram   udp    wait    root    /usr/sbin/in.tftpd /usr/sbin/in.tftpd -s /var/lib/tftpboot
+      - name: "Start/restart services"
+        systemd:
+          state: restarted
+          name: tftpd-hpa
+      - name: "Create directory for downloaded ISOs"
+        file:
+          path: /mnt/iso-storage
+          state: directory
+          mode: '0755'
+      - name: "Grab Ubuntu ISO for testing PXE boot"
+        get_url:
+          url: http://releases.ubuntu.com/16.04/ubuntu-16.04.6-server-amd64.iso
+          dest: /mnt/iso-storage/ubuntu-16.04.6-server-amd64.iso
+          checksum: sha256:http://releases.ubuntu.com/16.04/SHA256SUMS

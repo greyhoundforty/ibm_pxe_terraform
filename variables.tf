@@ -23,21 +23,17 @@ variable datacenter {
   }
 }
 
-variable node_count {
-  type    = "string"
-  default = "1"
-}
-
 variable os_reference_code {
-  type = "string"
+  type = "map"
 
   default = {
-    u16 = "UBUNTU_16_64"
+    u16  = "UBUNTU_16_64"
+    deb9 = "DEBIAN_9_64"
   }
 }
 
 variable flavor_key_name {
-  type = "string"
+  type = "map"
 
   default = {
     pxe = "B1_8X16X100"
@@ -46,7 +42,7 @@ variable flavor_key_name {
 
 variable domain {
   type    = "string"
-  default = ""
+  default = "cdetesting.com"
 }
 
 variable hostname {
@@ -55,11 +51,6 @@ variable hostname {
 }
 
 variable user_metadata {
-  type    = "string"
-  default = ""
-}
-
-variable localdisk {
   type    = "string"
   default = ""
 }

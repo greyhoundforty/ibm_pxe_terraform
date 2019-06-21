@@ -22,10 +22,10 @@ resource "ibm_compute_vm_instance" "pxe_server" {
   private_network_only = false
   user_metadata        = "${file("install.yml")}"
   flavor_key_name      = "${var.flavor_key_name["pxe"]}"
-  local_disk           = "${var.localdisk}"
   tags                 = ["ryantiffany", "pxe-server", "${var.datacenter["us-south2"]}"]
   ssh_key_ids          = ["${data.ibm_compute_ssh_key.deploymentKey.id}"]
   private_vlan_id      = "${ibm_network_vlan.pxe_vlan.id}"
+  local_disk           = false
 }
 
 # Create a temp inventory file to run Playbooks against 
@@ -49,8 +49,18 @@ EOF
 // }
 
 # Create Ticket to have helper IP set. May be better to use Terraform template file to genrate ticket and post it via Curl. Set to echo for now during testing. 
-resource "null_resource" "create_ticket" {
-  provisioner "local-exec" {
-    command = "echo slcli ticket create --title 'Set DHCP helper IP --subject-id 1061 --body 'Please set a DHCP helper IP of ${ibm_compute_vm_instance.pxe_server.ipv4_address_private} on VLAN ${ibm_network_vlan.pxe_vlan.id}'"
-  }
-}
+// resource "null_resource" "create_ticket" {
+//   provisioner "local-exec" {
+//     command = "echo slcli ticket create --title 'Set DHCP helper IP --subject-id 1061 --body 'Please set a DHCP helper IP of ${ibm_compute_vm_instance.pxe_server.ipv4_address_private} on VLAN ${ibm_network_vlan.pxe_vlan.id}'"
+//   }
+// }
+
+
+// POST https://$USERNAME:$APIKEY@api.softlayer.com/rest/v3/SoftLayer_Ticket/createStandardTicket
+
+// {
+//         'subjectId': 1061,
+//         'assignedUserId': '',
+//         'title': 'Set DHCP Helper IP',
+//         'priority': 4
+// }
