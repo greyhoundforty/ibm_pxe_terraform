@@ -36,7 +36,7 @@ pxe ansible_host=${ibm_compute_vm_instance.pxe_server.ipv4_address}
 
 EOF
 
-  filename = "${path.cwd}/inventory.env"
+  filename = "${path.cwd}/Hosts/inventory.env"
 }
 
 // # Curl data to send for ticket 

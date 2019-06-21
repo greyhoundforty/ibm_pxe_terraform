@@ -1,5 +1,5 @@
 ---
-  - hosts: homeservers
+  - hosts: vm_instances
     become: true
     tasks:
       - name: "Install PXE TFTP utilities"
@@ -33,5 +33,17 @@
       - name: "Grab Ubuntu ISO for testing PXE boot"
         get_url:
           url: http://releases.ubuntu.com/16.04/ubuntu-16.04.6-server-amd64.iso
-          dest: /mnt/iso-storage/ubuntu-16.04.6-server-amd64.iso
-          checksum: sha256:http://releases.ubuntu.com/16.04/SHA256SUMS
+          dest: /tmp/ubuntu-16.04.6-server-amd64.iso
+          mode: '0644'
+      - name: Mount DVD read-only
+        mount: 
+          path: /mnt/iso-storage
+          src: /tmp/ubuntu-16.04.6-server-amd64.iso
+          fstype: iso9660
+          opts: loop
+          state: present
+      - name: "Copy Ubuntu ISO install files to TFTP directory"
+        copy:
+          src: /mnt/iso-storage/install/netboot/
+          dest: /var/lib/tftpboot/
+          remote_src: yes
