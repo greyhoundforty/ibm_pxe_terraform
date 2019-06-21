@@ -1,0 +1,13 @@
+---
+  - hosts: vm_instances
+    become: true
+    tasks:
+      - name: Update yum packages
+        yum: name=* state=latest
+        when: ansible_facts['os_family'] == "CentOS"
+  - hosts: vm_instances
+    become: true
+    tasks:
+      - name: Update apt packages
+        apt: upgrade=yes update_cache=yes
+        when: ansible_facts['os_family'] == "Debian"    %
