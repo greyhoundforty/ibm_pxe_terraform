@@ -3,9 +3,14 @@ data "ibm_compute_ssh_key" "deploymentKey" {
   label = "ryan_tycho"
 }
 
+# Create a random name for our VLAN. This is mainly used in testing and will be removed at some point
+resource "random_id" "name" {
+  byte_length = 4
+}
+
 # Create our PXE Vlan 
 resource "ibm_network_vlan" "pxe_vlan" {
-  name            = "pxe_vlan"
+  name            = "pxe_vlan_${random_id.name.hex}"
   datacenter      = "${var.datacenter["us-south2"]}"
   type            = "PRIVATE"
   router_hostname = "bcr01a.${var.datacenter["us-south2"]}"
@@ -39,28 +44,44 @@ EOF
   filename = "${path.cwd}/Hosts/inventory.env"
 }
 
-// # Curl data to send for ticket 
-// resource "local_file" "ticket_body" {
-//   content = <<EOF
+# Create python ticket script
+resource "local_file" "python_ticket" {
+  depends_on = ["local_file.ansible_hosts"]
+  content = <<EOF
+import SoftLayer
+client = SoftLayer.Client()
+def createTicket(self):
+    current_user = client.call('SoftLayer_Account', 'getCurrentUser')
+    body = "This is a test automation ticket for a PXE boot process. Just need to see if the script picks up variables. Private IP = ${ibm_compute_vm_instance.pxe_server.ipv4_address_private} and VLAN = ${ibm_network_vlan.pxe_vlan.id}. Ticket can be closed."
+    # http://sldn.softlayer.com/reference/datatypes/SoftLayer_Ticket
+    new_ticket = {
+        'subjectId': 1061,
+        'assignedUserId': current_user['id'],
+        'title': 'Set DHCP helper IP for PXE boot - Test API ticket',
+        'priority': 4
+    }
+    # parameter list is from, need to be in order http://sldn.softlayer.com/reference/services/softlayer_ticket/createStandardTicket
+    created_ticket = client.call('SoftLayer_Ticket', 'createStandardTicket', 
+        new_ticket, body, serverId, serverPass, None, None, None, 'HARDWARE')
+    pp(created_ticket)
 
-// EOF
+EOF
 
-//   filename = "${path.cwd}/ticket_contents.json"
-// }
+  filename = "${path.cwd}/createPXETicket.py"
+}
 
-# Create Ticket to have helper IP set. May be better to use Terraform template file to genrate ticket and post it via Curl. Set to echo for now during testing. 
-// resource "null_resource" "create_ticket" {
-//   provisioner "local-exec" {
-//     command = "echo slcli ticket create --title 'Set DHCP helper IP --subject-id 1061 --body 'Please set a DHCP helper IP of ${ibm_compute_vm_instance.pxe_server.ipv4_address_private} on VLAN ${ibm_network_vlan.pxe_vlan.id}'"
-//   }
-// }
+# Call python to create ticket. I think this will be replaced by curl at some point 
+resource "null_resource" "create_ticket" {
+  depends_on = ["local_file.python_ticket"]
+  provisioner "local-exec" {
+    command = "/usr/local/bin/python3 ${path.cwd}/createPXETicket.py"
+  }
+}
 
-
-// POST https://$USERNAME:$APIKEY@api.softlayer.com/rest/v3/SoftLayer_Ticket/createStandardTicket
-
-// {
-//         'subjectId': 1061,
-//         'assignedUserId': '',
-//         'title': 'Set DHCP Helper IP',
-//         'priority': 4
-// }
+# Run ansible playbook to install and configure TFTP/DHCP/Webroot
+resource "null_resource" "run_playbook" {
+  depends_on = ["local_file.python_ticket"]
+  provisioner "local-exec" {
+    command = "ansible-playbook -i Hosts/inventory.env Playbooks/server-config.yml"
+  }
+}
