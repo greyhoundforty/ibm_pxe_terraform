@@ -75,10 +75,10 @@ resource "null_resource" "create_ticket" {
 
 
 # Run ansible playbook to install and configure TFTP/DHCP/Webroot
-// resource "null_resource" "run_playbook" {
-//   depends_on = ["local_file.python_ticket"]
+resource "null_resource" "run_playbook" {
+   depends_on = ["null_resource.create_ticket"]
 
-//   provisioner "local-exec" {
-//     command = "ansible-playbook -i Hosts/inventory.env Playbooks/server-config.yml"
-//   }
-// }
+   provisioner "local-exec" {
+     command = "ansible-playbook -i Hosts/inventory.env Playbooks/server-config.yml"
+   }
+ }
