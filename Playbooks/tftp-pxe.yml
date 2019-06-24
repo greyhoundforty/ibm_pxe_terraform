@@ -49,8 +49,13 @@
           fstype: iso9660
           opts: ro,loop
           state: mounted
-      - name: "Copy Ubuntu ISO install files to TFTP directory"
-        copy:
+      - name: Synchronize two directories on one remote host.
+        synchronize:
           src: /mnt/iso-storage/install/netboot/
           dest: /var/lib/tftpboot/
-          remote_src: yes
+        delegate_to: "{{ inventory_hostname }}"
+      # - name: "Copy Ubuntu ISO install files to TFTP directory"
+      #   copy:
+      #     src: /mnt/iso-storage/install/netboot/
+      #     dest: /var/lib/tftpboot/
+      #     remote_src: yes
