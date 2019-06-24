@@ -44,7 +44,6 @@ EOF
   filename = "${path.cwd}/Hosts/inventory.env"
 }
 
-
 resource "local_file" "curl_body" {
   depends_on = ["local_file.ansible_hosts"]
 
@@ -63,7 +62,6 @@ EOF
   filename = "${path.cwd}/ticket.json"
 }
 
-
 resource "null_resource" "create_ticket" {
   depends_on = ["local_file.curl_body"]
 
@@ -72,13 +70,11 @@ resource "null_resource" "create_ticket" {
   }
 }
 
-
-
 # Run ansible playbook to install and configure TFTP/DHCP/Webroot
 resource "null_resource" "run_playbook" {
-   depends_on = ["null_resource.create_ticket"]
+  depends_on = ["null_resource.create_ticket"]
 
-   provisioner "local-exec" {
-     command = "ansible-playbook -i Hosts/inventory.env Playbooks/server-config.yml"
-   }
- }
+  provisioner "local-exec" {
+    command = "ansible-playbook -i Hosts/inventory.env Playbooks/server-config.yml"
+  }
+}
