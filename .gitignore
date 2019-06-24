@@ -10,3 +10,4 @@
 *.tfplan
 *.env
 backend.tf
+ticket.json
