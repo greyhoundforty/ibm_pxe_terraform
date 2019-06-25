@@ -12,5 +12,6 @@ Example of how to deploy a PXE VSI. The code in this example will:
     - [ ] Configure the `pxelinux` configuration file
     - [ ] Configure DHCP settings 
  - [x] Create a support ticket to have the VSIs private IP set as the DHCP helper address on the router. 
+ - [ ] Deploy a NO OS server and test if it properly PXE boots.
 
 [Install PXE on Ubuntu 16](https://www.ostechnix.com/how-to-install-pxe-server-on-ubuntu-16-04/)

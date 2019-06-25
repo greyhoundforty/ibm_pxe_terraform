@@ -16,6 +16,16 @@ resource "ibm_network_vlan" "pxe_vlan" {
   router_hostname = "bcr01a.${var.datacenter["us-south2"]}"
 }
 
+# Create a subnet for DHCP server 
+resource "ibm_subnet" "dhcp_subnet" {
+  type = "Portable"
+  private = true
+  ip_version = 4
+  capacity = 8
+  vlan_id = "${ibm_network_vlan.pxe_vlan.id}"
+  notes = "dhcp testing subnet"
+}
+
 # Create our VSI PXE instance 
 resource "ibm_compute_vm_instance" "pxe_server" {
   hostname             = "pxe"
@@ -62,19 +72,23 @@ EOF
   filename = "${path.cwd}/ticket.json"
 }
 
-resource "null_resource" "create_ticket" {
-  depends_on = ["local_file.curl_body"]
+// resource "null_resource" "create_ticket" {
+//   depends_on = ["local_file.curl_body"]
 
-  provisioner "local-exec" {
-    command = "curl -u ${var.ibm_sl_username}:${var.ibm_sl_api_key} -X POST -H 'Accept: */*' -H 'Accept-Encoding: gzip, deflate, compress' -d @${path.cwd}/ticket.json 'https://api.softlayer.com/rest/v3.1/SoftLayer_Ticket/createStandardTicket.json'"
-  }
-}
+//   provisioner "local-exec" {
+//     command = "curl -u ${var.ibm_sl_username}:${var.ibm_sl_api_key} -X POST -H 'Accept: */*' -H 'Accept-Encoding: gzip, deflate, compress' -d @${path.cwd}/ticket.json 'https://api.softlayer.com/rest/v3.1/SoftLayer_Ticket/createStandardTicket.json'"
+//   }
+// }
 
 # Run ansible playbook to install and configure TFTP/DHCP/Webroot
-resource "null_resource" "run_playbook" {
-  depends_on = ["null_resource.create_ticket"]
+// resource "null_resource" "run_playbook" {
+//   // depends_on = ["null_resource.create_ticket"]
+//     depends_on = ["local_file.curl_body"]
+//   provisioner "local-exec" {
+//     command = "ansible-playbook -i Hosts/inventory.env Playbooks/server-config.yml"
+//   }
+// }
 
-  provisioner "local-exec" {
-    command = "ansible-playbook -i Hosts/inventory.env Playbooks/server-config.yml"
-  }
+output "subnet_cidr" {
+  value = "${ibm_subnet.dhcp_subnet.subnet_cidr}"
 }
