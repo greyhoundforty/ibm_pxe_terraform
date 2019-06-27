@@ -9,9 +9,10 @@ Example of how to deploy a PXE VSI. The code in this example will:
     - [x] Download ISO
     - [x] Copy ISO netboot tools in to the `tftpboot` directory
     - [x] Copy Ubuntu ISO files to PXE Dir
-    - [ ] Configure the `pxelinux` configuration file
-    - [ ] Configure DHCP settings 
+    - [x] Configure the `pxelinux` configuration file
+    - [x] Configure DHCP settings 
  - [x] Create a support ticket to have the VSIs private IP set as the DHCP helper address on the router. 
- - [ ] Deploy a NO OS server and test if it properly PXE boots.
 
-[Install PXE on Ubuntu 16](https://www.ostechnix.com/how-to-install-pxe-server-on-ubuntu-16-04/)
+## Todos
+ - [ ] Switch from DHCP and TFTP to dnsmasq as it has built in TFTP support and is more robust (Ansible)
+ - [ ] Deploy a NO OS server and test if it properly PXE boots.
