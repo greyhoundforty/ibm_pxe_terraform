@@ -52,19 +52,4 @@
         src: /mnt/iso-storage/
         dest: /var/www/html/server/bionic/
         remote_src: yes
-    - name: "Update dnsmasq conf"
-      blockinfile:
-          backup: yes
-          path: /etc/dnsmasq.conf
-          block: |
-              interface=eth0,lo
-              bind-interfaces
-              domain=cdetesting.local
-              dhcp-range=10.188.251.90,10.188.251.94,255.255.255.248,1h
-              dhcp-option=3,10.188.251.89
-              dhcp-option=6,10.188.251.89
-              server=8.8.8.8
-              dhcp-boot=/boot/pxelinux.0,pxeserver,10.188.251.210
-              enable-tftp
-              tftp-root=/var/lib/tftpboot/
 

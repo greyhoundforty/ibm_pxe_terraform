@@ -94,7 +94,7 @@ output "subnet_cidr" {
 }
 
 data "template_file" "init" {
-  template = "${file("${path.cwd}/Templates/pxe.yml.tpl")}"
+  template = "${file("${path.cwd}/Templates/dnsmasq.tpl")}"
 
   vars = {
     first_usable_ip = "${cidrhost(ibm_subnet.dhcp_subnet.subnet_cidr, 2)}"
@@ -102,7 +102,6 @@ data "template_file" "init" {
     subnet_netmask = "${cidrnetmask(ibm_subnet.dhcp_subnet.subnet_cidr)}"
     subnet_gw = "${cidrhost(ibm_subnet.dhcp_subnet.subnet_cidr, 1)}"
     pxe_ip = "${ibm_compute_vm_instance.pxe_server.ipv4_address_private}"
-    rando = "${random_id.name.hex}"
   }
 }
 
@@ -112,5 +111,5 @@ content = <<EOF
 
 EOF
 
-  filename = "${path.cwd}/Playbooks/pxe.yml"
+  filename = "${path.cwd}/Playbooks/dnsmasq.yml"
 }
