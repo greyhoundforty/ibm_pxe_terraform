@@ -11,9 +11,9 @@ Example of how to deploy a PXE VSI. The code in this example will:
     - Copy Ubuntu ISO files to PXE Dir
     - Update the dnsmasq configuration 
     - Configure DHCP settings 
- - Create a support ticket to have the VSIs private IP set as the DHCP helper address on the router. 
+ - Create a support ticket to have the VSIs private IP set as the DHCP helper address on the VLAN. 
  - Deploy a NO OS server and test if it properly PXE boots.
 
 ## Todos
  - [x] Switch from DHCP and TFTP to dnsmasq as it has built in TFTP support and is more robust (Ansible)
- - [ ] Look at recursive copy [issue]()
+ - [ ] Look at recursive copy [issue](https://github.com/greyhoundforty/ibm_pxe_terraform/issues/3)
