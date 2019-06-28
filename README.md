@@ -14,5 +14,5 @@ Example of how to deploy a PXE VSI. The code in this example will:
  - [x] Create a support ticket to have the VSIs private IP set as the DHCP helper address on the router. 
 
 ## Todos
- - [ ] Switch from DHCP and TFTP to dnsmasq as it has built in TFTP support and is more robust (Ansible)
+ - [x] Switch from DHCP and TFTP to dnsmasq as it has built in TFTP support and is more robust (Ansible)
  - [ ] Deploy a NO OS server and test if it properly PXE boots.
