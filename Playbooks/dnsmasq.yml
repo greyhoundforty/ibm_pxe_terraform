@@ -9,11 +9,12 @@
           block: |
               interface=eth0,lo
               bind-interfaces
+              listen-address=10.188.251.212,127.0.0.1
               domain=cdetesting.local
-              dhcp-range=${first_usable_ip},${last_usable_ip},${subnet_netmask},1h
-              dhcp-option=3,${subnet_gw}
-              dhcp-option=6,${subnet_gw}
+              dhcp-range=10.188.243.42,10.188.243.46,255.255.255.248,1h
+              dhcp-option=3,10.188.243.41
+              dhcp-option=6,8.8.8.8,4.2.2.2
               server=8.8.8.8
-              dhcp-boot=/boot/pxelinux.0,pxeserver,${pxe_ip}
+              dhcp-boot=/boot/pxelinux.0,pxeserver,10.188.251.212
               enable-tftp
               tftp-root=/var/lib/tftpboot/

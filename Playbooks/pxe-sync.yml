@@ -43,13 +43,13 @@
         opts: ro,loop
         state: mounted
     - name: "Sync netboot files"
-      copy:
+      synchronize:
         src: /mnt/iso-storage/install/netboot/
         dest: /var/lib/tftpboot/
-        remote_src: yes
+      delegate_to: "{{ inventory_hostname }}"
     - name: "Sync web files"
-      copy:
+      synchronize:
         src: /mnt/iso-storage/
         dest: /var/www/html/server/bionic/
-        remote_src: yes
+      delegate_to: "{{ inventory_hostname }}"
 

@@ -1,4 +1,4 @@
 ---
   - import_playbook: update.yml
-  - import_playbook: pxe.yml
+  - import_playbook: pxe-sync.yml
   - import_playbook: dnsmasq.yml
