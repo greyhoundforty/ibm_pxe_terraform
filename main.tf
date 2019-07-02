@@ -85,7 +85,7 @@ resource "local_file" "dnsmasq_config" {
               tftp-root=/var/lib/tftpboot/
 EOF
 
- filename = "${path.cwd}/Playbooks/dnsmasq.yml"
+  filename = "${path.cwd}/Playbooks/dnsmasq.yml"
 }
 
 resource "local_file" "curl_body" {
@@ -117,7 +117,8 @@ resource "null_resource" "create_ticket" {
 # Run ansible playbook to install and configure TFTP/DHCP/Webroot
 resource "null_resource" "run_playbook" {
   // depends_on = ["null_resource.create_ticket"]
-    depends_on = ["local_file.curl_body"]
+  depends_on = ["local_file.curl_body"]
+
   provisioner "local-exec" {
     command = "ansible-playbook -i Hosts/inventory.env Playbooks/server-config.yml"
   }
@@ -151,4 +152,3 @@ resource "ibm_compute_bare_metal" "no_os" {
 
   redundant_power_supply = true
 }
-
