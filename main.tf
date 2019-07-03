@@ -1,6 +1,6 @@
 # Pull in existing SSH key for use with Ansible
 data "ibm_compute_ssh_key" "deploymentKey" {
-  label = "ryan_tycho"
+  label = "sshkey_label"
 }
 
 # Create a random name for our VLAN. This is mainly used in testing and will be removed at some point
