@@ -1,8 +1,3 @@
-# Pull in existing SSH key for use with Ansible
-data "ibm_compute_ssh_key" "deploymentKey" {
-  label = "sshkey_label"
-}
-
 # Create a random name for our VLAN. This is mainly used in testing and will be removed at some point
 resource "random_id" "name" {
   byte_length = 4
@@ -42,7 +37,6 @@ resource "ibm_compute_vm_instance" "pxe_server" {
   user_metadata        = "${file("install.yml")}"
   flavor_key_name      = "${var.flavor_key_name["pxe"]}"
   tags                 = ["ryantiffany", "pxe-server", "${var.datacenter["us-east2"]}"]
-  ssh_key_ids          = ["${data.ibm_compute_ssh_key.deploymentKey.id}"]
   private_vlan_id      = "${ibm_network_vlan.pxe_vlan.id}"
   local_disk           = false
 }
@@ -51,7 +45,7 @@ resource "ibm_compute_vm_instance" "pxe_server" {
 resource "local_file" "ansible_hosts" {
   content = <<EOF
 [vm_instances]
-pxe ansible_host=${ibm_compute_vm_instance.pxe_server.ipv4_address} 
+pxe ansible_host=${ibm_compute_vm_instance.pxe_server.ipv4_address} ansible_user=deployer
 
 EOF
 
@@ -63,26 +57,26 @@ resource "local_file" "dnsmasq_config" {
   depends_on = ["local_file.ansible_hosts"]
 
   content = <<EOF
----
-  - hosts: vm_instances
-    become: true
-    tasks:
-    - name: "Update dnsmasq conf"
-      blockinfile:
-          backup: yes
-          path: /etc/dnsmasq.conf
-          block: |
-              interface=eth0,lo
-              bind-interfaces
-              listen-address=${ibm_compute_vm_instance.pxe_server.ipv4_address_private},127.0.0.1
-              domain=cdetesting.local
-              dhcp-range=${cidrhost(ibm_subnet.dhcp_subnet.subnet_cidr, 2)},${cidrhost(ibm_subnet.dhcp_subnet.subnet_cidr, 6)},${cidrnetmask(ibm_subnet.dhcp_subnet.subnet_cidr)},1h
-              dhcp-option=3,${cidrhost(ibm_subnet.dhcp_subnet.subnet_cidr, 1)}
-              dhcp-option=6,8.8.8.8,4.2.2.2
-              server=8.8.8.8
-              dhcp-boot=/pxelinux.0,pxeserver,${ibm_compute_vm_instance.pxe_server.ipv4_address_private}
-              enable-tftp
-              tftp-root=/var/lib/tftpboot/
+  ---
+    - hosts: vm_instances
+      become: true
+      tasks:
+      - name: "Update dnsmasq conf"
+        blockinfile:
+            backup: yes
+            path: /etc/dnsmasq.conf
+            block: |
+                interface=eth0,lo
+                bind-interfaces
+                listen-address=${ibm_compute_vm_instance.pxe_server.ipv4_address_private},127.0.0.1
+                domain=cdetesting.local
+                dhcp-range=${cidrhost(ibm_subnet.dhcp_subnet.subnet_cidr, 2)},${cidrhost(ibm_subnet.dhcp_subnet.subnet_cidr, 6)},${cidrnetmask(ibm_subnet.dhcp_subnet.subnet_cidr)},1h
+                dhcp-option=3,${cidrhost(ibm_subnet.dhcp_subnet.subnet_cidr, 1)}
+                dhcp-option=6,8.8.8.8,4.2.2.2
+                server=8.8.8.8
+                dhcp-boot=/pxelinux.0,pxeserver,${ibm_compute_vm_instance.pxe_server.ipv4_address_private}
+                enable-tftp
+                tftp-root=/var/lib/tftpboot/
 EOF
 
   filename = "${path.cwd}/Playbooks/dnsmasq.yml"
@@ -125,20 +119,20 @@ resource "null_resource" "run_playbook" {
 }
 
 resource "ibm_compute_bare_metal" "no_os" {
-  # Mandatory fields
-  package_key_name = "DUAL_E52600_V4_12_DRIVES"
-  process_key_name = "INTEL_INTEL_XEON_E52620_V4_2_10"
-  memory           = 64
-  os_key_name      = "OS_NO_OPERATING_SYSTEM"
-  hostname         = "no-os"
-  domain           = "${var.domain}"
-  datacenter       = "${var.datacenter["us-east2"]}"
-  network_speed    = 10000
-  public_bandwidth = 500
-  disk_key_names   = ["HARD_DRIVE_800GB_SSD", "HARD_DRIVE_800GB_SSD", "HARD_DRIVE_800GB_SSD"]
-  hourly_billing   = false
+  depends_on = ["null_resource.run_playbook"]
 
-  # Optional fields
+  # Mandatory fields
+  package_key_name     = "DUAL_E52600_V4_12_DRIVES"
+  process_key_name     = "INTEL_INTEL_XEON_E52620_V4_2_10"
+  memory               = 64
+  os_key_name          = "OS_NO_OPERATING_SYSTEM"
+  hostname             = "no-os"
+  domain               = "${var.domain}"
+  datacenter           = "${var.datacenter["us-east2"]}"
+  network_speed        = 10000
+  public_bandwidth     = 500
+  disk_key_names       = ["HARD_DRIVE_800GB_SSD", "HARD_DRIVE_800GB_SSD", "HARD_DRIVE_800GB_SSD"]
+  hourly_billing       = false
   private_network_only = false
   unbonded_network     = true
 
@@ -147,7 +141,6 @@ resource "ibm_compute_bare_metal" "no_os" {
 
   tags = [
     "pxe-test",
-    "ryantiffany",
   ]
 
   redundant_power_supply = true

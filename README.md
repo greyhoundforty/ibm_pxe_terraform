@@ -23,11 +23,11 @@ To use this code you will need to make sure you have met the following requireme
  - Ansible installed - [guide](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) 
  - Updated the `credentials.tfvars.tpl` file with your IBM Cloud API key, SoftLayer username, and SoftLayer API Key.
 
-> * If you already have Terraform v0.12 installed you will need to use a differnet machine or downgrade. The IBM Cloud Provider plugin only supports pre-v0.12 Terraform versions. 
+> * If you already have Terraform v0.12 installed you will need to use a different machine or downgrade. The IBM Cloud Provider plugin only supports pre-v0.12 Terraform versions. 
 
 ## Testing the code
 
-### Grab the repositor
+### Grab the repository
 
 ```
 git clone https://github.com/greyhoundforty/ibm_pxe_terraform.git
