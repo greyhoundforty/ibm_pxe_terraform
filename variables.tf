@@ -45,7 +45,7 @@ variable flavor_key_name {
 
 variable domain {
   type    = "string"
-  default = "cdetesting.com"
+  default = "example.com"
 }
 
 variable hostname {
