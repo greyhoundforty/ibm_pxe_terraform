@@ -39,7 +39,7 @@ variable flavor_key_name {
   type = "map"
 
   default = {
-    pxe = "B1_8X16X100"
+    pxe = "B1_2X4X100"
   }
 }
 

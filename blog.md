@@ -25,7 +25,7 @@ git clone https://github.com/greyhoundforty/ibm_pxe_terraform.git
 cd ibm_pxe_terraform
 ```
 
-## Update the `install.yml` with your local SSH Key
+## Update the cloud-init install file 
 If you don't already have an SSH key generated, you will need to create one. The SSH key will be used to authenticate with our PXE instance for Ansible communication.
 
 ```
