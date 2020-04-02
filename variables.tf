@@ -1,20 +1,20 @@
-variable ibm_bx_api_key {
-  type    = "string"
+variable "ibm_bx_api_key" {
+  type    = string
   default = ""
 }
 
-variable ibm_sl_username {
-  type    = "string"
+variable "ibm_sl_username" {
+  type    = string
   default = ""
 }
 
-variable ibm_sl_api_key {
-  type    = "string"
+variable "ibm_sl_api_key" {
+  type    = string
   default = ""
 }
 
-variable datacenter {
-  type = "map"
+variable "datacenter" {
+  type = map(string)
 
   default = {
     us-south1 = "dal10"
@@ -26,8 +26,8 @@ variable datacenter {
   }
 }
 
-variable os_reference_code {
-  type = "map"
+variable "os_reference_code" {
+  type = map(string)
 
   default = {
     u16  = "UBUNTU_16_64"
@@ -35,25 +35,26 @@ variable os_reference_code {
   }
 }
 
-variable flavor_key_name {
-  type = "map"
+variable "flavor_key_name" {
+  type = map(string)
 
   default = {
     pxe = "B1_2X4X100"
   }
 }
 
-variable domain {
-  type    = "string"
+variable "domain" {
+  type    = string
   default = "example.com"
 }
 
-variable hostname {
-  type    = "string"
+variable "hostname" {
+  type    = string
   default = ""
 }
 
-variable user_metadata {
-  type    = "string"
+variable "user_metadata" {
+  type    = string
   default = ""
 }
+
